@@ -1,12 +1,12 @@
 import pygame, sys
 from random import randint, uniform
 
-WINDOW_WIDTH = 1280
+WINDOW_WIDTH = 1280 
 WINDOW_HEIGHT = 720
 clock = pygame.time.Clock()
 dt = clock.tick(60) / 1000
 pygame.init()
-pygame.display.set_caption("Defend the castle")
+pygame.display.set_caption("Shoot things")
 pygame.mouse.set_visible(False)
 display_surface = pygame.display.set_mode ((WINDOW_WIDTH, WINDOW_HEIGHT))
 
