@@ -6,8 +6,8 @@ WINDOW_HEIGHT = 720
 clock = pygame.time.Clock()
 dt = clock.tick(60) / 1000
 pygame.init()
-pygame.display.set_caption("Shoot things")
-pygame.mouse.set_visible(False)
+pygame.display.set_caption("Shoot things") #game window's name
+pygame.mouse.set_visible(False) #hids the coursor. Yt is replaced with custom one later in the code. 
 display_surface = pygame.display.set_mode ((WINDOW_WIDTH, WINDOW_HEIGHT))
 
 global_volume = 0.3
@@ -29,27 +29,27 @@ get_hit_sound.set_volume(global_volume)
 #-----------#
 
 
-class Player(pygame.sprite.Sprite,):
+class Player(pygame.sprite.Sprite,): #player's class
     def __init__(self, groups, coins = 0, speed = 300, health = 3, attack_speed = 0):
         super().__init__(groups)
         self.image = pygame.image.load('sprites/player.png').convert_alpha()
         self.rect = self.image.get_rect(center = (WINDOW_WIDTH/2,WINDOW_HEIGHT/2))
         self.mask = pygame.mask.from_surface(self.image)
-        self.speed = speed
+        self.speed = speed #movement speed parameter
         self.can_shoot = True
         self.shoot_time = None
-        self.coins = coins
-        self.health = health
+        self.coins = coins #coins or score. every hit on an enemy gives 1 point/coin
+        self.health = health #base number of health is 3. It means you can get hit only 3 times before game closes
         self.is_not_hit = True
         self.hit_timer = None
         self.flicker_timer = None
-        self.attack_speed = attack_speed
+        self.attack_speed = attack_speed #base delay between every shot measured  in miliseconds
 
 
     def avoid_damage(self):
         if not self.is_not_hit:
             current_time = pygame.time.get_ticks()
-            if current_time - self.hit_timer > 1500:
+            if current_time - self.hit_timer > 1500: #1500 is a time how long the player cannot get hit again
                 self.is_not_hit = True
 
 
@@ -87,7 +87,7 @@ class Player(pygame.sprite.Sprite,):
 
 
 
-    def attack_timer(self):
+    def attack_timer(self): #counts delays between every shot
         if not self.can_shoot:
             current_time = pygame.time.get_ticks()
             if current_time - self.shoot_time > self.attack_speed:
@@ -108,11 +108,11 @@ class Player(pygame.sprite.Sprite,):
             self.can_shoot = False
             self.shoot_time = pygame.time.get_ticks()
             arrow_sound.play()
-            Arrows1(weapons_group, self.rect.midright)
+            Arrows1(weapons_group, self.rect.midright) #spawns arrow/arrow's sprite
 
 
 
-    def restrictions(self):
+    def restrictions(self): # as it says, prevents the player's sprite from moving beyond window's borders
         if self.rect.left <= 0:
             self.rect.left = 0
         if self.rect.right >= WINDOW_WIDTH:
@@ -136,7 +136,7 @@ class Arrows1(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midleft = pos)
         self.mask = pygame.mask.from_surface(self.image)
         self.speed = 400
-        self.direction = pygame.math.Vector2(1, uniform(-0.07,0.07))
+        self.direction = pygame.math.Vector2(1, uniform(-0.07,0.07)) #set the arrow to be not laser accurate. give a bit of randomness to the game
         self.rotation = 0
         self.pos = pygame.math.Vector2(self.rect.topleft)
         super().__init__(groups)
@@ -187,7 +187,7 @@ class Enemies(pygame.sprite.Sprite):
         if self.rect.left < 10:
             self.kill_sprite()
         if pygame.sprite.spritecollide(self, weapons_group, True, pygame.sprite.collide_mask):
-            self.health -= 1
+            self.health -= 1 #not sure why it doesnt work all the time, sometimes enemies die after 1 hit
             hit2_sound.play()
             if self.health == 0:
                 dies_sound.play()
@@ -195,7 +195,7 @@ class Enemies(pygame.sprite.Sprite):
 
 
 
-class Coursor(pygame.sprite.Sprite):
+class Coursor(pygame.sprite.Sprite): #custom coursor, not really a necessary function at this point. mouse do nothing in this game
     def __init__(self, groups):
         super().__init__(groups)
         self.image = pygame.image.load('sprites/coursor.png').convert_alpha()
@@ -223,13 +223,12 @@ player = Player(player_group)
 enemies_group = pygame.sprite.Group()
 
 enemies_timer = pygame.event.custom_type() 
-pygame.time.set_timer(enemies_timer, 1200)
+pygame.time.set_timer(enemies_timer, 1200) #sets the delay between every enemy spawn, in miliseconds
 
-coins_set = 0
-speed_set = 400
-attack_speed_set = 500
-player.coins = coins_set
-click_status = False
+coins_set = 0 #since player gets coins/points for hitting the enemy, i guess it was necessary to change the default value in the class so i could overwrite it 
+speed_set = 400 #same as above
+attack_speed_set = 500 #here's too
+player.coins = coins_set 
 player.attack_speed = attack_speed_set
 
 while True:
@@ -240,8 +239,8 @@ while True:
         if event.type == enemies_timer:
             Enemies(enemies_group, 60, health = 3)
 
-    if pygame.sprite.groupcollide(weapons_group, enemies_group, False, False, pygame.sprite.collide_mask):
-        coins_set += 1
+    if pygame.sprite.groupcollide(weapons_group, enemies_group, False, False, pygame.sprite.collide_mask): #this loop might cause some problems, enemies might die instantly, insted of after 3 hits, i think.
+        coins_set += 1 #gives coins/points for ever hit
     
     player.coins = coins_set
 
